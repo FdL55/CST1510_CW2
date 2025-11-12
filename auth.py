@@ -1,25 +1,66 @@
 import bcrypt
 import os
 
+
 def hash_password(plain_text_password):
-    return
-def verify_password():
-    return
+    """Hashes a plain text password using bcrypt."""
+    return bcrypt.hashpw(plain_text_password.encode('utf-8'), bcrypt.gensalt())
+
+
+def verify_password(plain_text_password, hashed_password):
+    """Verifies a password against its hash."""
+    return bcrypt.checkpw(plain_text_password.encode('utf-8'), hashed_password)
+
 
 USER_DATA_FILE = "users.txt"
 
+
 def register_user(username, password):
+    """Registers a new user and saves to users.txt."""
+    if user_exists(username):
+        print("Error: Username already exists.")
+        return False
+
+    hashed_pw = hash_password(password)
+    with open(USER_DATA_FILE, "ab") as file:
+        file.write(username.encode('utf-8') + b":" + hashed_pw + b"\n")
+
+    print(f"User '{username}' registered successfully!")
     return True
 
+
 def user_exists(username):
+    """Checks if a username already exists in the file."""
+    if not os.path.exists(USER_DATA_FILE):
+        return False
+
+    with open(USER_DATA_FILE, "rb") as file:
+        for line in file:
+            stored_username, _ = line.strip().split(b":")
+            if stored_username.decode('utf-8') == username:
+                return True
     return False
 
-def login_user(username, password):
 
- def validate_username(username):
-     pass
- def validate_password(password):
-     pass
+def login_user(username, password):
+    """Authenticates a user by verifying credentials from users.txt."""
+    if not os.path.exists(USER_DATA_FILE):
+        print("Error: No users registered yet.")
+        return False
+
+    with open(USER_DATA_FILE, "rb") as file:
+        for line in file:
+            stored_username, stored_hash = line.strip().split(b":")
+            if stored_username.decode('utf-8') == username:
+                if verify_password(password, stored_hash):
+                    return True
+                else:
+                    print("Error: Incorrect password.")
+                    return False
+
+    print("Error: Username not found.")
+    return False
+
 
 def display_menu():
     """Displays the main menu options."""
@@ -47,30 +88,6 @@ def validate_password(password):
     if len(password) < 6:
         return False, "Password must be at least 6 characters long."
     return True, ""
-
-
-# Temporary in-memory user storage
-users_db = {}
-
-
-def register_user(username, password):
-    """Register a new user into the system."""
-    if username in users_db:
-        print("Error: Username already exists.")
-    else:
-        users_db[username] = password
-        print(f"User '{username}' registered successfully!")
-
-
-def login_user(username, password):
-    """Authenticate a user."""
-    if username not in users_db:
-        print("Error: Username not found.")
-        return False
-    if users_db[username] != password:
-        print("Error: Incorrect password.")
-        return False
-    return True
 
 
 def main():
