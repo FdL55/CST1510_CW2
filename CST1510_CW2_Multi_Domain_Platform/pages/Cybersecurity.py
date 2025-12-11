@@ -20,7 +20,7 @@ st.sidebar.page_link("pages/IT_Operations.py", label="🛠️ IT Operations")
 st.sidebar.page_link("pages/3_AI_Assistant.py", label="🤖 AI Assistant")
 
 st.set_page_config(page_title="Cybersecurity")
-st.title("Cybersecurity")
+st.title("Cyber Incidents")
 
 from models.security_incident import SecurityIncident
 from services.database_manager import DatabaseManager
